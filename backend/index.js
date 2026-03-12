@@ -6,12 +6,10 @@ const app = express();
 
 app.use(express.json());
 
-
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
-
 
 const productSchema = new mongoose.Schema(
   {
@@ -68,74 +66,27 @@ const productSchema = new mongoose.Schema(
 
 const Product = mongoose.model("Product", productSchema);
 
-
 app.get("/", (req, res) => {
   res.send("Inventory API Running");
 });
 
-
 app.post("/products", async (req, res) => {
   try {
     const product = await Product.create(req.body);
-
     res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-
 app.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
-
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
-
-
-app.get("/products/:id", async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product Not Found" });
-    }
-
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
-app.put("/products/:id", async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-
-app.delete("/products/:id", async (req, res) => {
-  try {
-    await Product.findByIdAndDelete(req.params.id);
-
-    res.status(200).json({ message: "Product Deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 
 app.get("/products/search", async (req, res) => {
   try {
@@ -151,7 +102,6 @@ app.get("/products/search", async (req, res) => {
   }
 });
 
-
 app.get("/products/category", async (req, res) => {
   try {
     const cat = req.query.cat;
@@ -164,6 +114,42 @@ app.get("/products/category", async (req, res) => {
   }
 });
 
+app.get("/products/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product Not Found" });
+    }
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.put("/products/:id", async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.delete("/products/:id", async (req, res) => {
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Product Deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 
